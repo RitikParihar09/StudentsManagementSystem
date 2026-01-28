@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Students</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-10">
+
+<!-- Heading -->
+<h1 class="text-3xl font-bold text-center text-blue-600 mb-2">
+    Student Management System
+</h1>
+
+<h3 class="text-xl text-center text-gray-600 mb-8">
+    Student List
+</h3>
+
+<!-- Card -->
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+
+    <!-- Add Student Button -->
+    <div class="mb-4 text-right">
+        <button onclick="openAddModal()"
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+            + Add Student
+        </button>
+    </div>
+
+    <!-- Table -->
+    <table class="w-full border-collapse">
+        <thead class="bg-blue-500 text-white">
+        <tr>
+            <th class="p-3 text-left">First Name</th>
+            <th class="p-3 text-left">Last Name</th>
+            <th class="p-3 text-left">Email</th>
+            <th class="p-3 text-center">Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="student : ${students}"
+            class="border-b hover:bg-gray-100 transition">
+
+            <td class="p-3" th:text="${student.firstName}"></td>
+            <td class="p-3" th:text="${student.lastName}"></td>
+            <td class="p-3 text-blue-600" th:text="${student.email}"></td>
+
+            <!-- Actions -->
+            <td class="p-3 text-center space-x-2">
+
+                <!-- UPDATE -->
+                <button
+                        class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                        onclick="openEditModal(this)"
+                        th:data-id="${student.id}"
+                        th:data-firstname="${student.firstName}"
+                        th:data-lastname="${student.lastName}"
+                        th:data-email="${student.email}">
+                    Update
+                </button>
+
+                <!-- DELETE -->
+                <a th:href="@{/students/delete/{id}(id=${student.id})}"
+                   class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                   onclick="return confirm('Are you sure you want to delete this student?')">
+                    Delete
+                </a>
+            </td>
+        </tr>
+
+        <!-- Empty -->
+        <tr th:if="${#lists.isEmpty(students)}">
+            <td colspan="4" class="p-4 text-center text-gray-500">
+                No students found
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ================= MODAL ================= -->
+
+<div id="studentModal"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+
+    <div class="bg-white rounded-lg w-96 p-6">
+
+        <h2 id="modalTitle" class="text-xl font-bold mb-4 text-center">
+            Add Student
+        </h2>
+
+        <!-- ✅ FIXED FORM ACTION -->
+        <form th:action="@{/students/save}" method="post">
+
+            <!-- Hidden ID (for update) -->
+            <input type="hidden" name="id" id="studentId">
+
+            <!-- First Name -->
+            <div class="mb-3">
+                <label class="block text-gray-600 mb-1">First Name</label>
+                <input type="text" id="firstName" name="firstName" required
+                       class="w-full border px-3 py-2 rounded focus:ring focus:ring-blue-300">
+            </div>
+
+            <!-- Last Name -->
+            <div class="mb-3">
+                <label class="block text-gray-600 mb-1">Last Name</label>
+                <input type="text" id="lastName" name="lastName" required
+                       class="w-full border px-3 py-2 rounded focus:ring focus:ring-blue-300">
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label class="block text-gray-600 mb-1">Email</label>
+                <input type="email" id="email" name="email" required
+                       class="w-full border px-3 py-2 rounded focus:ring focus:ring-blue-300">
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3">
+                <button type="button"
+                        onclick="closeModal()"
+                        class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Save
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+    function openAddModal() {
+        document.getElementById("modalTitle").innerText = "Add Student";
+        document.getElementById("studentId").value = "";
+        document.getElementById("firstName").value = "";
+        document.getElementById("lastName").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("studentModal").classList.remove("hidden");
+    }
+
+    function openEditModal(button) {
+        document.getElementById("modalTitle").innerText = "Update Student";
+
+        document.getElementById("studentId").value =
+            button.getAttribute("data-id");
+
+        document.getElementById("firstName").value =
+            button.getAttribute("data-firstname");
+
+        document.getElementById("lastName").value =
+            button.getAttribute("data-lastname");
+
+        document.getElementById("email").value =
+            button.getAttribute("data-email");
+
+        document.getElementById("studentModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+        document.getElementById("studentModal").classList.add("hidden");
+    }
+</script>
+
+</body>
+</html>
